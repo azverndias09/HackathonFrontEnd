@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:health_hack/utils/api.dart';
 import 'package:provider/provider.dart';
-import '../models/userInfo.dart';
 import '../widgets/snackBars.dart';
 import '../utils/routes.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({Key? key}) : super(key: key);
-  final TextEditingController _emailTextController = TextEditingController();
-  final TextEditingController _passwordTextController = TextEditingController();
+class ResetPage extends StatelessWidget {
+  ResetPage({Key? key}) : super(key: key);
+  TextEditingController _OtpTextController = TextEditingController();
+  TextEditingController _newPasswordController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +43,7 @@ class LoginPage extends StatelessWidget {
                 Column(
                   children: <Widget>[
                     Text(
-                      "Login",
+                      "Reset Password",
                       style: TextStyle(
                           fontSize: 30,
                           color: Colors.black,
@@ -53,26 +53,25 @@ class LoginPage extends StatelessWidget {
                       height: 20,
                     ),
                     Text(
-                      "Login to your account",
+                      "",
                       style: TextStyle(fontSize: 15, color: Colors.grey[700]),
                     )
                   ],
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 40),
+                  padding: const EdgeInsets.symmetric(horizontal: 40),
                   child: Column(
                     children: <Widget>[
                       EnterInfo(
-                          label: "Email",
-                          textController: _emailTextController,
+                          label: "OTP",
+                          textController: _OtpTextController,
                           valider: () {},
                           obscureText: false),
                       EnterInfo(
-                        label: "Password",
-                        obscureText: true,
-                        valider: () {},
-                        textController: _passwordTextController,
-                      )
+                          label: "New Password",
+                          textController: _newPasswordController,
+                          valider: () {},
+                          obscureText: true),
                     ],
                   ),
                 ),
@@ -92,30 +91,29 @@ class LoginPage extends StatelessWidget {
                       minWidth: double.infinity,
                       height: 60,
                       onPressed: () async {
-                        if (_emailTextController.value.text.isNotEmpty &&
-                            _passwordTextController.value.text.isNotEmpty) {
+                        if (_OtpTextController.value.text.isNotEmpty) {
                           ScaffoldMessenger.of(context)
-                              .showSnackBar(goodSnackBar("Good"));
+                              .showSnackBar(goodSnackBar("Done"));
+
                           Provider.of<ApiProvider>(context, listen: false)
-                              .checkExUser()
-                              .then((value) async {
-                            if (value) {
-                              await Navigator.pushNamed(
-                                  context, MyRoutes.mainRoute);
+                              .resetConfirm(
+                            _OtpTextController.text,
+                            _newPasswordController.text,
+                          )
+                              .then((value) {
+                            print("msg value is --$value");
+                            if (value == "Password changed successfull") {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(goodSnackBar(value));
+                              Navigator.pushNamed(context, MyRoutes.loginRoute);
+                            } else {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(badSnackBar(value));
                             }
                           });
-
-                          Provider.of<ApiProvider>(context, listen: false)
-                              .userLog(UserLogInfo(
-                            _emailTextController.text,
-                            _passwordTextController.text,
-                          ));
-
-                          await Navigator.pushNamed(
-                              context, MyRoutes.entryRoute);
                         } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              badSnackBar("Enter correct details!"));
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(badSnackBar("Not Done"));
                         }
                       },
                       color: Color(0xff0095FF),
@@ -124,7 +122,7 @@ class LoginPage extends StatelessWidget {
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: const Text(
-                        "Login",
+                        "Reset Password",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 18,
@@ -154,15 +152,6 @@ class LoginPage extends StatelessWidget {
                           ),
                         )),
                   ],
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(context, MyRoutes.forgotRoute);
-                  },
-                  child: const Text(
-                    "Forgot Password? Click Me",
-                    style: TextStyle(color: Colors.black),
-                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.only(top: 50),

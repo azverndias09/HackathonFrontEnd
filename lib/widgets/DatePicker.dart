@@ -6,6 +6,10 @@ class BirthPicker extends StatelessWidget {
   final DateTime date = DateTime.now();
   String formattedDate = '';
 
+  String sendFormattedDate() {
+    return formattedDate;
+  }
+
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -15,7 +19,9 @@ class BirthPicker extends StatelessWidget {
               initialDate: date,
               firstDate: DateTime(1900),
               lastDate: DateTime.now());
-          formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(_dob!);
+          if (_dob != null) {
+            formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(_dob!);
+          }
         },
         child: Text("DOB"));
   }

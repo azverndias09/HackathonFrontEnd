@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:health_hack/utils/api.dart';
+import 'package:provider/provider.dart';
+
 import '../Utils/routes.dart';
-import '../Utils/themes.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:http/http.dart' as http;
 import '../models/userInfo.dart';
-import 'package:intl/intl.dart';
-
-import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 import '../widgets/snackBars.dart';
 
@@ -80,29 +78,32 @@ class _SignupPageState extends State<SignupPage> {
                   )
                 ],
               ),
-              Column(
-                children: <Widget>[
-                  EnterInfo(
-                      label: "Name",
-                      textController: _nameTextController,
-                      valider: () {},
-                      obscureText: false),
-                  EnterInfo(
+              Form(
+                child: Column(
+                  children: <Widget>[
+                    EnterInfo(
+                        label: "Name",
+                        textController: _nameTextController,
+                        valider: () {},
+                        obscureText: false),
+                    EnterInfo(
                       label: "Email",
                       textController: _emailTextController,
                       obscureText: false,
-                      valider: () {}),
-                  EnterInfo(
-                      label: "Password",
-                      obscureText: true,
-                      textController: _passwordTextController,
-                      valider: () {}),
-                  EnterInfo(
-                      label: "Confirm Password ",
-                      obscureText: true,
-                      textController: _passwordVerifyTextController,
-                      valider: () {}),
-                ],
+                      valider: () {},
+                    ),
+                    EnterInfo(
+                        label: "Password",
+                        obscureText: true,
+                        textController: _passwordTextController,
+                        valider: () {}),
+                    EnterInfo(
+                        label: "Confirm Password ",
+                        obscureText: true,
+                        textController: _passwordVerifyTextController,
+                        valider: () {}),
+                  ],
+                ),
               ),
               Container(
                 padding: const EdgeInsets.only(top: 3, left: 3),
@@ -121,17 +122,19 @@ class _SignupPageState extends State<SignupPage> {
                     if (_nameTextController.value.text.isNotEmpty &&
                         _emailTextController.value.text.isNotEmpty &&
                         _passwordTextController.value.text.isNotEmpty &&
-                        _passwordVerifyTextController.value.text.isNotEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(goodSnackBar);
-                      UserSignInfo(
+                        _passwordVerifyTextController.value.text.isNotEmpty &&
+                        _passwordVerifyTextController.text ==
+                            _passwordTextController.text) {
+                      Provider.of<ApiProvider>(context, listen: false)
+                          .userSign(UserSignInfo(
                         _nameTextController.text,
                         _emailTextController.text,
                         _passwordTextController.text,
-                        // formatDate,
-                      );
-                      await Navigator.pushNamed(context, MyRoutes.homeRoute);
+                      ));
+                      await Navigator.pushNamed(context, MyRoutes.entryRoute);
                     } else {
-                      ScaffoldMessenger.of(context).showSnackBar(badSnackBar);
+                      ScaffoldMessenger.of(context)
+                          .showSnackBar(badSnackBar("Enter Correct Details!"));
                     }
                   },
                   color: const Color(0xff0095FF),

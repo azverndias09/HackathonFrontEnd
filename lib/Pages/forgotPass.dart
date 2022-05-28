@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:health_hack/utils/api.dart';
 import 'package:provider/provider.dart';
-import '../models/userInfo.dart';
 import '../widgets/snackBars.dart';
 import '../utils/routes.dart';
 
-class LoginPage extends StatelessWidget {
-  LoginPage({Key? key}) : super(key: key);
-  final TextEditingController _emailTextController = TextEditingController();
-  final TextEditingController _passwordTextController = TextEditingController();
+class ForgotPage extends StatelessWidget {
+  ForgotPage({Key? key}) : super(key: key);
+  TextEditingController _emailTextController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,7 +42,7 @@ class LoginPage extends StatelessWidget {
                 Column(
                   children: <Widget>[
                     Text(
-                      "Login",
+                      "Forgot Password",
                       style: TextStyle(
                           fontSize: 30,
                           color: Colors.black,
@@ -67,12 +66,6 @@ class LoginPage extends StatelessWidget {
                           textController: _emailTextController,
                           valider: () {},
                           obscureText: false),
-                      EnterInfo(
-                        label: "Password",
-                        obscureText: true,
-                        valider: () {},
-                        textController: _passwordTextController,
-                      )
                     ],
                   ),
                 ),
@@ -92,30 +85,27 @@ class LoginPage extends StatelessWidget {
                       minWidth: double.infinity,
                       height: 60,
                       onPressed: () async {
-                        if (_emailTextController.value.text.isNotEmpty &&
-                            _passwordTextController.value.text.isNotEmpty) {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(goodSnackBar("Good"));
+                        if (_emailTextController.value.text.isNotEmpty) {
+                          //  ScaffoldMessenger.of(context).showSnackBar(goodSnackBar("OTP Has been Sent!"));
+
                           Provider.of<ApiProvider>(context, listen: false)
-                              .checkExUser()
-                              .then((value) async {
-                            if (value) {
-                              await Navigator.pushNamed(
-                                  context, MyRoutes.mainRoute);
+                              .forgotPassword(
+                            _emailTextController.text,
+                          )
+                              .then((value) {
+                            print("msg value is --$value");
+                            if (value == "reset mail sent") {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(goodSnackBar(value));
+                              Navigator.pushNamed(context, MyRoutes.resetRoute);
+                            } else if (value == "User does not exist.") {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(goodSnackBar(value));
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  badSnackBar("Network Issue Try Again"));
                             }
                           });
-
-                          Provider.of<ApiProvider>(context, listen: false)
-                              .userLog(UserLogInfo(
-                            _emailTextController.text,
-                            _passwordTextController.text,
-                          ));
-
-                          await Navigator.pushNamed(
-                              context, MyRoutes.entryRoute);
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                              badSnackBar("Enter correct details!"));
                         }
                       },
                       color: Color(0xff0095FF),
@@ -157,10 +147,10 @@ class LoginPage extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Navigator.pushNamed(context, MyRoutes.forgotRoute);
+                    Navigator.pushNamed(context, MyRoutes.loginRoute);
                   },
                   child: const Text(
-                    "Forgot Password? Click Me",
+                    "Remember it? Click here To Login",
                     style: TextStyle(color: Colors.black),
                   ),
                 ),
